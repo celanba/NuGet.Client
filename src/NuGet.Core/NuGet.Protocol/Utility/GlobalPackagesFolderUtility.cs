@@ -34,7 +34,7 @@ namespace NuGet.Protocol
 
             var defaultPackagePathResolver = new VersionFolderPathResolver(globalPackagesFolder);
 
-            var newHashPath = defaultPackagePathResolver.GetNewHashPath(packageIdentity.Id, packageIdentity.Version);
+            var newHashPath = defaultPackagePathResolver.GetNupkgMetadataPath(packageIdentity.Id, packageIdentity.Version);
             var hashPath = defaultPackagePathResolver.GetHashPath(packageIdentity.Id, packageIdentity.Version);
             var installPath = defaultPackagePathResolver.GetInstallPath(
                     packageIdentity.Id,

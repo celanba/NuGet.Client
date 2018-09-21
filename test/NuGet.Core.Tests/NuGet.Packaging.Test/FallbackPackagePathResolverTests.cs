@@ -249,7 +249,7 @@ namespace NuGet.Packaging.Test
                 foreach (var root in new[] { userFolder, fallbackFolders[0] })
                 {
                     var localResolver = new VersionFolderPathResolver(root);
-                    File.Delete(localResolver.GetNewHashPath("a", NuGetVersion.Parse("1.0.0")));
+                    File.Delete(localResolver.GetNupkgMetadataPath("a", NuGetVersion.Parse("1.0.0")));
                 }
 
                 var expected = Path.Combine(targetFolder, "a", "1.0.0");

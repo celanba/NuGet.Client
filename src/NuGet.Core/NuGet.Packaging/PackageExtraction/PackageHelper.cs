@@ -66,16 +66,16 @@ namespace NuGet.Packaging
             {
                 return !ExcludePaths.Any(p =>
                     packageFileName.StartsWith(p, StringComparison.OrdinalIgnoreCase)) &&
-                    !IsHashFile(packageFileName);
+                    !IsNuGetGeneratedFile(packageFileName);
             }
 
             return false;
         }
 
-        private static bool IsHashFile(string path)
+        private static bool IsNuGetGeneratedFile(string path)
         {
             return path.EndsWith(PackagingCoreConstants.HashFileExtension, StringComparison.OrdinalIgnoreCase) ||
-                path.EndsWith(PackagingCoreConstants.NewHashFileExtension, StringComparison.OrdinalIgnoreCase);
+                path.EndsWith(PackagingCoreConstants.NupkgMetadataFileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

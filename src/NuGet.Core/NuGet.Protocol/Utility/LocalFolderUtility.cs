@@ -1180,12 +1180,12 @@ namespace NuGet.Protocol
                             }
 
                             // write the new hash file
-                            var hashFile = new PackageHashFile()
+                            var hashFile = new NupkgMetadataFile()
                             {
                                 ContentHash = packageHash
                             };
 
-                            PackageHashFileFormat.Write(tempNewHashFilePath, hashFile);
+                            NupkgMetadataFileFormat.Write(tempNewHashFilePath, hashFile);
                             File.Move(tempNewHashFilePath, newHashPath);
                         }
                     }

@@ -124,11 +124,11 @@ namespace NuGet.Packaging
         /// <param name="packageId">The package ID.</param>
         /// <param name="version">The package version.</param>
         /// <returns>The hash file path.</returns>
-        public string GetNewHashPath(string packageId, NuGetVersion version)
+        public string GetNupkgMetadataPath(string packageId, NuGetVersion version)
         {
             return Path.Combine(
                 GetInstallPath(packageId, version),
-                PackagingCoreConstants.NewHashFileExtension);
+                PackagingCoreConstants.NupkgMetadataFileExtension);
         }
 
         /// <summary>

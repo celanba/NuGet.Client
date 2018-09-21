@@ -401,7 +401,7 @@ namespace NuGet.Packaging
                 var targetNuspec = versionFolderPathResolver.GetManifestFilePath(packageIdentity.Id, packageIdentity.Version);
                 var targetNupkg = versionFolderPathResolver.GetPackageFilePath(packageIdentity.Id, packageIdentity.Version);
                 var hashPath = versionFolderPathResolver.GetHashPath(packageIdentity.Id, packageIdentity.Version);
-                var newHashFilePath = versionFolderPathResolver.GetNewHashPath(packageIdentity.Id, packageIdentity.Version);
+                var nupkgMetadataFilePath = versionFolderPathResolver.GetNupkgMetadataPath(packageIdentity.Id, packageIdentity.Version);
 
                 logger.LogVerbose(
                     $"Acquiring lock for the installation of {packageIdentity.Id} {packageIdentity.Version}");
@@ -414,7 +414,7 @@ namespace NuGet.Packaging
                         // If this is the first process trying to install the target nupkg, go ahead
                         // After this process successfully installs the package, all other processes
                         // waiting on this lock don't need to install it again.
-                        if (!File.Exists(newHashFilePath))
+                        if (!File.Exists(nupkgMetadataFilePath))
                         {
                             logger.LogVerbose(
                                 $"Acquired lock for the installation of {packageIdentity.Id} {packageIdentity.Version}");
@@ -451,7 +451,7 @@ namespace NuGet.Packaging
 
                             var targetTempNupkg = Path.Combine(targetPath, Path.GetRandomFileName());
                             var tempHashPath = Path.Combine(targetPath, Path.GetRandomFileName());
-                            var tempNewHashPath = Path.Combine(targetPath, Path.GetRandomFileName());
+                            var tempNupkgMetadataPath = Path.Combine(targetPath, Path.GetRandomFileName());
                             var packageSaveMode = packageExtractionContext.PackageSaveMode;
 
                             try
@@ -516,21 +516,21 @@ namespace NuGet.Packaging
                                         File.WriteAllText(tempHashPath, packageHash);
 
                                         // get hash for the unsigned content of signed package
-                                        var newHash = packageReader.GetContentHashForSignedPackage(cancellationToken);
+                                        var contentHash = packageReader.GetContentHashForSignedPackage(cancellationToken);
 
                                         // if null, then it's unsigned package so just use the existing hash
-                                        if (string.IsNullOrEmpty(newHash))
+                                        if (string.IsNullOrEmpty(contentHash))
                                         {
-                                            newHash = packageHash;
+                                            contentHash = packageHash;
                                         }
 
                                         // write the new hash file
-                                        var hashFile = new PackageHashFile()
+                                        var hashFile = new NupkgMetadataFile()
                                         {
-                                            ContentHash = newHash
+                                            ContentHash = contentHash
                                         };
 
-                                        PackageHashFileFormat.Write(tempNewHashPath, hashFile);
+                                        NupkgMetadataFileFormat.Write(tempNupkgMetadataPath, hashFile);
                                     }
                                 }
                             }
@@ -584,7 +584,7 @@ namespace NuGet.Packaging
                             // Rename the tmp hash file
                             File.Move(tempHashPath, hashPath);
 
-                            File.Move(tempNewHashPath, newHashFilePath);
+                            File.Move(tempNupkgMetadataPath, nupkgMetadataFilePath);
 
                             logger.LogVerbose($"Completed installation of {packageIdentity.Id} {packageIdentity.Version}");
 
@@ -663,7 +663,7 @@ namespace NuGet.Packaging
                 var targetNuspec = versionFolderPathResolver.GetManifestFilePath(packageIdentity.Id, packageIdentity.Version);
                 var targetNupkg = versionFolderPathResolver.GetPackageFilePath(packageIdentity.Id, packageIdentity.Version);
                 var hashPath = versionFolderPathResolver.GetHashPath(packageIdentity.Id, packageIdentity.Version);
-                var newHashFilePath = versionFolderPathResolver.GetNewHashPath(packageIdentity.Id, packageIdentity.Version);
+                var nupkgMetadataFilePath = versionFolderPathResolver.GetNupkgMetadataPath(packageIdentity.Id, packageIdentity.Version);
 
                 logger.LogVerbose(
                     $"Acquiring lock for the installation of {packageIdentity.Id} {packageIdentity.Version}");
@@ -676,7 +676,7 @@ namespace NuGet.Packaging
                         // If this is the first process trying to install the target nupkg, go ahead
                         // After this process successfully installs the package, all other processes
                         // waiting on this lock don't need to install it again.
-                        if (!File.Exists(newHashFilePath))
+                        if (!File.Exists(nupkgMetadataFilePath))
                         {
                             logger.LogVerbose(
                                 $"Acquired lock for the installation of {packageIdentity.Id} {packageIdentity.Version}");
@@ -713,7 +713,7 @@ namespace NuGet.Packaging
 
                             var targetTempNupkg = Path.Combine(targetPath, Path.GetRandomFileName());
                             var tempHashPath = Path.Combine(targetPath, Path.GetRandomFileName());
-                            var tempNewHashFilePath = Path.Combine(targetPath, Path.GetRandomFileName());
+                            var tempNupkgMetadataFilePath = Path.Combine(targetPath, Path.GetRandomFileName());
                             var packageSaveMode = packageExtractionContext.PackageSaveMode;
 
                             // Extract the nupkg
@@ -825,21 +825,21 @@ namespace NuGet.Packaging
                             File.WriteAllText(tempHashPath, packageHash);
 
                             // get hash for the unsigned content of signed package
-                            var newHash = packageDownloader.SignedPackageReader.GetContentHashForSignedPackage(cancellationToken);
+                            var contentHash = packageDownloader.SignedPackageReader.GetContentHashForSignedPackage(cancellationToken);
 
                             // if null, then it's unsigned package so use the existing hash
-                            if (string.IsNullOrEmpty(newHash))
+                            if (string.IsNullOrEmpty(contentHash))
                             {
-                                newHash = packageHash;
+                                contentHash = packageHash;
                             }
 
                             // write the new hash file
-                            var hashFile = new PackageHashFile()
+                            var hashFile = new NupkgMetadataFile()
                             {
                                 ContentHash = packageHash
                             };
 
-                            PackageHashFileFormat.Write(tempNewHashFilePath, hashFile);
+                            NupkgMetadataFileFormat.Write(tempNupkgMetadataFilePath, hashFile);
 
                             // Now rename the tmp file
                             if (packageExtractionContext.PackageSaveMode.HasFlag(PackageSaveMode.Nupkg))
@@ -873,7 +873,7 @@ namespace NuGet.Packaging
                             // Rename the tmp hash file
                             File.Move(tempHashPath, hashPath);
 
-                            File.Move(tempNewHashFilePath, newHashFilePath);
+                            File.Move(tempNupkgMetadataFilePath, nupkgMetadataFilePath);
 
                             logger.LogVerbose($"Completed installation of {packageIdentity.Id} {packageIdentity.Version}");
 

@@ -6,13 +6,13 @@ using NuGet.Shared;
 
 namespace NuGet.Packaging
 {
-    public class PackageHashFile : IEquatable<PackageHashFile>
+    public class NupkgMetadataFile : IEquatable<NupkgMetadataFile>
     {
-        public int Version { get; set; } = PackageHashFileFormat.Version;
+        public int Version { get; set; } = NupkgMetadataFileFormat.Version;
 
         public string ContentHash { get; set; }
 
-        public bool Equals(PackageHashFile other)
+        public bool Equals(NupkgMetadataFile other)
         {
             if (other == null)
             {
@@ -30,7 +30,7 @@ namespace NuGet.Packaging
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as PackageHashFile);
+            return Equals(obj as NupkgMetadataFile);
         }
 
         public override int GetHashCode()

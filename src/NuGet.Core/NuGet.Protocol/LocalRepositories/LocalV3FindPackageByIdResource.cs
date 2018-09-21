@@ -385,7 +385,7 @@ namespace NuGet.Protocol
                         continue;
                     }
 
-                    var newHashPath = _resolver.GetNewHashPath(id, version);
+                    var newHashPath = _resolver.GetNupkgMetadataPath(id, version);
                     var hashPath = _resolver.GetHashPath(id, version);
 
                     // first check for existing hash file then new hash file.

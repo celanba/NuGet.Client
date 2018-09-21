@@ -162,7 +162,7 @@ namespace NuGet.Repositories
                         continue;
                     }
 
-                    var newHashPath = PathResolver.GetNewHashPath(id, version);
+                    var newHashPath = PathResolver.GetNupkgMetadataPath(id, version);
                     var hashPath = PathResolver.GetHashPath(id, version);
                     var zipPath = PathResolver.GetPackageFilePath(id, version);
                     var installPath = PathResolver.GetInstallPath(id, version);

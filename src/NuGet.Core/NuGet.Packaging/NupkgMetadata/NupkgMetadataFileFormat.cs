@@ -10,7 +10,7 @@ using NuGet.Common;
 
 namespace NuGet.Packaging
 {
-    public class PackageHashFileFormat
+    public class NupkgMetadataFileFormat
     {
         public static readonly int Version = 1;
 
@@ -23,12 +23,12 @@ namespace NuGet.Packaging
             CommentHandling = CommentHandling.Ignore
         };
 
-        public static PackageHashFile Read(string filePath)
+        public static NupkgMetadataFile Read(string filePath)
         {
             return Read(filePath, NullLogger.Instance);
         }
 
-        public static PackageHashFile Read(string filePath, ILogger log)
+        public static NupkgMetadataFile Read(string filePath, ILogger log)
         {
             using (var stream = File.OpenRead(filePath))
             {
@@ -36,7 +36,7 @@ namespace NuGet.Packaging
             }
         }
 
-        public static PackageHashFile Read(Stream stream, ILogger log, string path)
+        public static NupkgMetadataFile Read(Stream stream, ILogger log, string path)
         {
             using (var textReader = new StreamReader(stream))
             {
@@ -44,7 +44,7 @@ namespace NuGet.Packaging
             }
         }
 
-        public static PackageHashFile Read(TextReader reader, ILogger log, string path)
+        public static NupkgMetadataFile Read(TextReader reader, ILogger log, string path)
         {
             try
             {
@@ -78,9 +78,9 @@ namespace NuGet.Packaging
             }
         }
 
-        private static PackageHashFile ReadHashFile(JObject cursor)
+        private static NupkgMetadataFile ReadHashFile(JObject cursor)
         {
-            var hashFile = new PackageHashFile()
+            var hashFile = new NupkgMetadataFile()
             {
                 Version = ReadInt(cursor, VersionProperty, defaultValue: int.MinValue),
                 ContentHash = ReadProperty<string>(cursor, HashProperty),
@@ -112,7 +112,7 @@ namespace NuGet.Packaging
             return default(TItem);
         }
 
-        public static void Write(string filePath, PackageHashFile hashFile)
+        public static void Write(string filePath, NupkgMetadataFile hashFile)
         {
             // Create the directory if it does not exist
             var fileInfo = new FileInfo(filePath);
@@ -124,7 +124,7 @@ namespace NuGet.Packaging
             }
         }
 
-        public static void Write(Stream stream, PackageHashFile hashFile)
+        public static void Write(Stream stream, NupkgMetadataFile hashFile)
         {
             using (var textWriter = new StreamWriter(stream))
             {
@@ -132,7 +132,7 @@ namespace NuGet.Packaging
             }
         }
 
-        public static void Write(TextWriter textWriter, PackageHashFile hashFile)
+        public static void Write(TextWriter textWriter, NupkgMetadataFile hashFile)
         {
             using (var jsonWriter = new JsonTextWriter(textWriter))
             {
@@ -143,7 +143,7 @@ namespace NuGet.Packaging
             }
         }
 
-        private static JObject WriteHashFile(PackageHashFile hashFile)
+        private static JObject WriteHashFile(NupkgMetadataFile hashFile)
         {
             var json = new JObject
             {

@@ -120,7 +120,7 @@ namespace NuGet.Packaging
             // Check each folder for the package.
             foreach (var resolver in _pathResolvers)
             {
-                var hashPath = resolver.GetNewHashPath(packageId, version);
+                var hashPath = resolver.GetNupkgMetadataPath(packageId, version);
 
                 if (File.Exists(hashPath))
                 {
