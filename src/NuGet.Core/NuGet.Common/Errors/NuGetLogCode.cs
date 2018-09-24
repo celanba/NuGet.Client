@@ -721,6 +721,11 @@ namespace NuGet.Common
         NU5123 = 5123,
 
         /// <summary>
+        /// Warning_UnrecognizedLicenseIdentifier
+        /// </summary>
+        NU5124 = 5124, // TODO NK - these warnings are 51, while they should've been 55. 
+
+        /// <summary>
         /// Undefined package warning
         /// </summary>
         NU5500 = 5500

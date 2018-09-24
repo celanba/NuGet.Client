@@ -483,13 +483,10 @@ namespace NuGet.Packaging
         {
             if (licenseMetadata.Src != null)
             {
-
                 var ext = Path.GetExtension(licenseMetadata.Src);
-                if(ext != null && ext.Equals("txt", StringComparison.OrdinalIgnoreCase) && ext.Equals("md", StringComparison.OrdinalIgnoreCase))
+                if (ext != null && ext.Equals(".txt", StringComparison.OrdinalIgnoreCase) && ext.Equals(".md", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new PackagingException(NuGetLogCode.NU5031, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileExtensionIsInvalid, licenseMetadata.Src));
-                    // TODO NK - Here I can also validate that the extensions are correct
-
                 }
                 var count = files.Where(e => e.Path.Equals(licenseMetadata.Src)).Count();
                 if (count == 0)
