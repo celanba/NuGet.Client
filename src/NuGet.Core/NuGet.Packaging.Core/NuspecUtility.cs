@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
-using NuGet.Packaging;
 
 namespace NuGet.Packaging.Core
 {
@@ -26,6 +25,9 @@ namespace NuGet.Packaging.Core
         public static readonly string RepositoryUrl = "url";
         public static readonly string RepositoryBranch = "branch";
         public static readonly string RepositoryCommit = "commit";
+        public static readonly string License = "license";
+        public static readonly string LicenseExpression = "expression";
+        public static readonly string Src = "src";
 
         /// <summary>
         /// Gets the package types from a .nuspec metadata XML element.

@@ -171,6 +171,29 @@ namespace NuGet.Build.Tasks.Pack
                     request.RepositoryBranch,
                     request.RepositoryCommit);
             }
+
+            if (!string.IsNullOrEmpty(request.PackageLicenseExpression) || !string.IsNullOrEmpty(request.PackageLicenseFile))
+            {
+                if(request.PackageLicenseExpression != null && request.PackageLicenseFile != null)
+                {
+                    throw new PackagingException(NuGetLogCode.NU5033, string.Format(
+                        CultureInfo.CurrentCulture,
+                        Strings.InvalidLicenseCombination,
+                        request.PackageLicenseExpression));
+                }
+
+                NuGetVersion version;
+                if (!NuGetVersion.TryParse(request.PackageVersion, out version))
+                {
+                    throw new PackagingException(NuGetLogCode.NU5032, string.Format(
+                        CultureInfo.CurrentCulture,
+                        Strings.InvalidLicenseExpression,
+                        request.PackageLicenseExpression)); // TODO NK - Append the message from the parsing.
+                }
+
+                builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, request.PackageLicenseFile);
+            }
+
             if (request.MinClientVersion != null)
             {
                 Version version;

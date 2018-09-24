@@ -56,6 +56,7 @@ namespace NuGet.Packaging
             ContentFiles = copy.ContentFiles;
             DevelopmentDependency = copy.DevelopmentDependency;
             Repository = copy.Repository;
+            LicenseMetadata = copy.LicenseMetadata;
         }
 
         [ManifestVersion(5)]
@@ -230,6 +231,8 @@ namespace NuGet.Packaging
         
         public IEnumerable<PackageType> PackageTypes { get; set; } = new List<PackageType>();
 
+        public LicenseMetadata LicenseMetadata { get; set; } = null;
+
         private static IEnumerable<PackageDependencyGroup> MergeDependencyGroups(IEnumerable<PackageDependencyGroup> actualDependencyGroups)
         {
             if (actualDependencyGroups == null)
@@ -325,10 +328,11 @@ namespace NuGet.Packaging
                 yield return String.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_UriCannotBeEmpty, "ProjectUrl");
             }
 
-            if (RequireLicenseAcceptance && String.IsNullOrWhiteSpace(_licenseUrl))
+            if (RequireLicenseAcceptance && (string.IsNullOrWhiteSpace(_licenseUrl) && LicenseMetadata == null))
             {
                 yield return NuGetResources.Manifest_RequireLicenseAcceptanceRequiresLicenseUrl;
             }
+            // TODO NK - Should the parsing of the nuget license be done here? validation be here or somewhere else.
         }
     }
 }

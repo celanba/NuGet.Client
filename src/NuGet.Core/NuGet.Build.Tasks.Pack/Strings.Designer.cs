@@ -89,6 +89,24 @@ namespace NuGet.Build.Tasks.Pack {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid metadata. Cannot specify both a License Expression and a License File..
+        /// </summary>
+        internal static string InvalidLicenseCombination {
+            get {
+                return ResourceManager.GetString("InvalidLicenseCombination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The license expression &apos;{0}&apos; cannot be parsed succesfully..
+        /// </summary>
+        internal static string InvalidLicenseExpression {
+            get {
+                return ResourceManager.GetString("InvalidLicenseExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MinClientVersion string specified &apos;{0}&apos; is invalid..
         /// </summary>
         internal static string InvalidMinClientVersion {

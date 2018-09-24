@@ -300,6 +300,45 @@ namespace NuGet.Packaging.Test
                   </metadata>
                 </package>";
 
+        private const string LicenseFileBasic = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license src=""LICENSE.txt""/>
+                  </metadata>
+                </package>";
+
+        private const string LicenseExpressionBasic = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license expression=""MIT""/>
+                  </metadata>
+                </package>";
+
+        private const string LicenseExpressionHasBothAttributes = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license src=""LICENSE.txt"" expression=""MIT""/>
+                  </metadata>
+                </package>";
+
         public static IEnumerable<object[]> GetValidVersions()
         {
             return GetVersionRange(validVersions: true);
@@ -715,6 +754,50 @@ namespace NuGet.Packaging.Test
             repo.Branch.Should().BeEmpty();
             repo.Commit.Should().BeEmpty();
         }
+
+        [Fact]
+        public void NuspecReaderTests_LicenseFileBasic()
+        {
+            // Arrange
+            var reader = GetReader(LicenseFileBasic);
+
+            // Act
+            var licenseMetadata = reader.GetLicenseMedata();
+
+            // Assert
+            licenseMetadata.LicenseExpression.Should().Be(null);
+            licenseMetadata.Src.Should().Be("LICENSE.txt");
+        }
+
+        [Fact]
+        public void NuspecReaderTests_LicenseExpressionBasic()
+        {
+            // Arrange
+            var reader = GetReader(LicenseExpressionBasic);
+
+            // Act
+            var licenseMetadata = reader.GetLicenseMedata();
+
+            // Assert
+            licenseMetadata.LicenseExpression.Should().Be("MIT");
+            licenseMetadata.Src.Should().Be(null);
+        }
+
+        [Fact]
+        public void NuspecReaderTests_LicenseExpressionHasBothAttributes_Throws()
+        {
+            // Arrange
+            var reader = GetReader(LicenseExpressionHasBothAttributes);
+
+            //Act
+            Action action = () => reader.GetLicenseMedata();
+
+            /// Assert
+            var ex = Assert.Throws<PackagingException>(action);
+            // TODO NK - Assert the exception content
+        }
+
+
 
         private static NuspecReader GetReader(string nuspec)
         {

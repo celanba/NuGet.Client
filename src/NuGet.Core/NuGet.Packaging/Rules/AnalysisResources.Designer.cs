@@ -206,6 +206,15 @@ namespace NuGet.Packaging.Rules {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The license identifier &apos;{0}&apos; is not recognized by this currrent toolset..
+        /// </summary>
+        public static string UnrecognizedLicenseIdentifier {
+            get {
+                return ResourceManager.GetString("UnrecognizedLicenseIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The script file &apos;{0}&apos; is not recognized by NuGet and hence will not be executed during installation of this package. Rename it to install.ps1, uninstall.ps1 or init.ps1 and place it directly under &apos;tools&apos;..
         /// </summary>
         public static string UnrecognizedScriptWarning {

@@ -51,7 +51,7 @@ namespace NuGet.Packaging
             // now check for required elements, which include <id>, <version>, <authors> and <description>
             foreach (var requiredElement in RequiredElements)
             {
-                if(requiredElement.Equals("authors") && manifestMetadata.PackageTypes.Contains(PackageType.SymbolsPackage))
+                if (requiredElement.Equals("authors") && manifestMetadata.PackageTypes.Contains(PackageType.SymbolsPackage))
                 {
                     continue;
                 }
@@ -84,7 +84,7 @@ namespace NuGet.Packaging
                         manifestMetadata.Id = value;
                         break;
                     case "version":
-                        manifestMetadata.Version = NuGetVersion.Parse(value);
+                        manifestMetadata.Version = NuGetVersion.Parse(value); // TODO NK - This probably throws if the version is invalid. 
                         break;
                     case "authors":
                         manifestMetadata.Authors = value?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -146,6 +146,9 @@ namespace NuGet.Packaging
                     case "repository":
                         manifestMetadata.Repository = ReadRepository(element);
                         break;
+                    case "license":
+                        manifestMetadata.LicenseMetadata = ReadLicenseMetadata(element);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -160,8 +163,23 @@ namespace NuGet.Packaging
                 {
                     throw new InvalidDataException(string.Format(NuGetResources.Manifest_PropertyValueReadFailure, value, element.Name.LocalName), ex);
                 }
-                
             }
+        }
+
+        private static LicenseMetadata ReadLicenseMetadata(XElement element)
+        {
+            var src = element.Attribute(NuspecUtility.Src)?.Value;
+            var expression = element.Attribute(NuspecUtility.LicenseExpression)?.Value;
+
+            var expressionHasValue = string.IsNullOrEmpty(expression);
+            var isSrcNullOrEmpty = string.IsNullOrEmpty(src);
+
+            if ((expressionHasValue && isSrcNullOrEmpty) || (!expressionHasValue && !expressionHasValue))
+            {
+                throw new PackagingException(string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseElementMissingAttributes));
+            }
+            // TODO NK - verify that the LicenseExpression is valid. Or maybe don't do it here, but just do it later in Pack.
+            return new LicenseMetadata(licenseExpression: expression, src: src);
         }
 
         private static List<ManifestContentFiles> ReadContentFiles(XElement contentFilesElement)
@@ -341,7 +359,7 @@ namespace NuGet.Packaging
                 var exclude = file.GetOptionalAttributeValue("exclude").SafeTrim();
 
                 // Multiple sources can be specified by using semi-colon separated values. 
-                files.AddRange(srcElement.Value.Trim(';').Split(';').Select(s => 
+                files.AddRange(srcElement.Value.Trim(';').Split(';').Select(s =>
                     new ManifestFile
                     {
                         Source = s.SafeTrim(),

@@ -129,6 +129,13 @@
     <value>The file '{0}' to be packed was not found on disk.</value>
     <comment>{0} is the file being packed.</comment>
   </data>
+  <data name="InvalidLicenseCombination" xml:space="preserve">
+    <value>Invalid metadata. Cannot specify both a License Expression and a License File.</value>
+  </data>
+  <data name="InvalidLicenseExpression" xml:space="preserve">
+    <value>The license expression '{0}' cannot be parsed succesfully.</value>
+    <comment>0 - the license expression</comment>
+  </data>
   <data name="InvalidMinClientVersion" xml:space="preserve">
     <value>MinClientVersion string specified '{0}' is invalid.</value>
     <comment>{0} is the version.</comment>
