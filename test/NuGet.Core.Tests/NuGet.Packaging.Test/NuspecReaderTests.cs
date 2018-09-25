@@ -766,7 +766,7 @@ namespace NuGet.Packaging.Test
 
             // Assert
             licenseMetadata.LicenseExpression.Should().Be(null);
-            licenseMetadata.Src.Should().Be("LICENSE.txt");
+            licenseMetadata.File.Should().Be("LICENSE.txt");
         }
 
         [Fact]
@@ -780,7 +780,7 @@ namespace NuGet.Packaging.Test
 
             // Assert
             licenseMetadata.LicenseExpression.Should().Be("MIT");
-            licenseMetadata.Src.Should().Be(null);
+            licenseMetadata.File.Should().Be(null);
         }
 
         [Fact]

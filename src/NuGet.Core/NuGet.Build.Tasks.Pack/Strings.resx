@@ -136,6 +136,10 @@
     <value>The license expression '{0}' cannot be parsed succesfully.</value>
     <comment>0 - the license expression</comment>
   </data>
+  <data name="InvalidLicenseExpressionVersion" xml:space="preserve">
+    <value>The version string '{0}' for the LicenseExpression is invalid.</value>
+    <comment>{0} version string</comment>
+  </data>
   <data name="InvalidMinClientVersion" xml:space="preserve">
     <value>MinClientVersion string specified '{0}' is invalid.</value>
     <comment>{0} is the version.</comment>

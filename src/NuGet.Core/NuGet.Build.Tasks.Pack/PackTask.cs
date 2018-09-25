@@ -71,6 +71,7 @@ namespace NuGet.Build.Tasks.Pack
         public string WarningsAsErrors { get; set; }
         public string PackageLicenseExpression { get; set; }
         public string PackageLicenseFile { get; set; }
+        public string PackageLicenseExpressionVersion { get; set; }
         public ILogger Logger => new MSBuildLogger(Log);
 
         private IPackTaskLogic _packTaskLogic;
@@ -210,6 +211,7 @@ namespace NuGet.Build.Tasks.Pack
                 WarningsAsErrors = MSBuildStringUtility.TrimAndGetNullForEmpty(WarningsAsErrors),
                 PackageLicenseExpression = MSBuildStringUtility.TrimAndGetNullForEmpty(PackageLicenseExpression),
                 PackageLicenseFile = MSBuildStringUtility.TrimAndGetNullForEmpty(PackageLicenseFile),
+                PackageLicenseExpressionVersion = MSBuildStringUtility.TrimAndGetNullForEmpty(PackageLicenseExpressionVersion),
             };
         }
     }

@@ -107,6 +107,15 @@ namespace NuGet.Build.Tasks.Pack {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The version string &apos;{0}&apos; for the LicenseExpression is invalid..
+        /// </summary>
+        internal static string InvalidLicenseExpressionVersion {
+            get {
+                return ResourceManager.GetString("InvalidLicenseExpressionVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MinClientVersion string specified &apos;{0}&apos; is invalid..
         /// </summary>
         internal static string InvalidMinClientVersion {

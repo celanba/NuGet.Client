@@ -747,4 +747,10 @@ Valid from:</comment>
   <data name="NuGetLicenseExpression_LicenseInvalidCharacters" xml:space="preserve">
     <value>The license identifier '{0}' contains invalid characters.</value>
   </data>
+  <data name="License_InvalidLicenseExpression" xml:space="preserve">
+    <value>The license expression '{0}' cannot be parsed succesfully.</value>
+  </data>
+  <data name="License_InvalidLicenseExpressionVersion" xml:space="preserve">
+    <value>The version string '{0}' for the LicenseExpression is invalid.</value>
+  </data>
 </root>

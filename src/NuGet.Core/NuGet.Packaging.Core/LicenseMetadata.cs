@@ -8,24 +8,28 @@ namespace NuGet.Packaging.Core
 {
     public class LicenseMetadata : IEquatable<LicenseMetadata>
     {
-        public LicenseMetadata(string licenseExpression, string src)
+        public static Version EmptyVersion = new Version(0,0);
+        public static Version CurrentVersion = new Version(0, 0);
+        public string LicenseExpression { get; }
+        public string File { get; }
+        public Version Version { get; }
+
+        public LicenseMetadata(string licenseExpression, string file, Version version)
         {
-            if (licenseExpression == null && src == null)
+            if (licenseExpression == null && file == null)
             {
-                throw new ArgumentNullException("Cannot be null");
+                throw new ArgumentNullException($"{nameof(licenseExpression)} and {nameof(file)} cannot be null");
             }
 
-            if (licenseExpression != null && src != null)
+            if (licenseExpression != null && file != null)
             {
-                throw new ArgumentException("Both cannot be set");
+                throw new ArgumentException($"{nameof(licenseExpression)} and {nameof(file)} are exclusive. Both cannot be set.");
             }
 
             LicenseExpression = licenseExpression;
-            Src = src;
+            File = file;
+            Version = version ?? throw new ArgumentNullException(nameof(version));
         }
-
-        public string LicenseExpression { get; private set; }
-        public string Src { get; private set; }
 
 
         public bool Equals(LicenseMetadata other)
@@ -38,7 +42,8 @@ namespace NuGet.Packaging.Core
             var metadata = obj as LicenseMetadata;
             return metadata != null &&
                    LicenseExpression == metadata.LicenseExpression &&
-                   Src == metadata.Src;
+                   File == metadata.File &&
+                   Version == metadata.Version;
         }
 
         public override int GetHashCode()
@@ -46,7 +51,8 @@ namespace NuGet.Packaging.Core
             var combiner = new HashCodeCombiner();
 
             combiner.AddObject(LicenseExpression);
-            combiner.AddObject(Src);
+            combiner.AddObject(File);
+            combiner.AddObject(Version);
 
             return combiner.CombinedHash;
         }

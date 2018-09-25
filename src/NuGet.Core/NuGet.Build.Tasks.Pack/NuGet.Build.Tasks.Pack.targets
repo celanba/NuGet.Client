@@ -252,6 +252,7 @@ Copyright (c) .NET Foundation. All rights reserved.
               SymbolPackageFormat="$(SymbolPackageFormat)"
               PackageLicenseFile="$(PackageLicenseFile)"
               PackageLicenseExpression="$(PackageLicenseExpression)"
+              PackageLicenseExpressionVersion="$(PackageLicenseExpressionVersion)"
               />
   </Target>
 

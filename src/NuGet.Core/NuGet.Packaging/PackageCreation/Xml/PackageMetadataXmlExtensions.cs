@@ -247,7 +247,7 @@ namespace NuGet.Packaging.Xml
             var attributes = new List<XAttribute>();
 
             attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.LicenseExpression, metadata.LicenseExpression));
-            attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.Src, metadata.Src));
+            attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.File, metadata.File));
 
             attributes = attributes.Where(xAtt => xAtt != null).ToList();
 
@@ -304,7 +304,7 @@ namespace NuGet.Packaging.Xml
             attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.PackageTypeName, packageType.Name));
             if (packageType.Version != PackageType.EmptyVersion)
             {
-                attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.PackageTypeVersion, packageType.Version));
+                attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.Version, packageType.Version));
             }
 
             attributes = attributes.Where(xAtt => xAtt != null).ToList();

@@ -990,7 +990,7 @@ namespace NuGet.Packaging.Test
                     packageTypeNode.SetAttributeValue(NuspecUtility.PackageTypeName, packageType.Name);
                     if (packageType.Version != PackageType.EmptyVersion)
                     {
-                        packageTypeNode.SetAttributeValue(NuspecUtility.PackageTypeVersion, packageType.Version);
+                        packageTypeNode.SetAttributeValue(NuspecUtility.Version, packageType.Version);
                     }
 
                     packageTypesNode.Add(packageTypeNode);

@@ -606,6 +606,11 @@ namespace NuGet.Common
         NU5033 = 5033,
 
         /// <summary>
+        /// Error_Manifest_InvalidLicenseExpressionVersion
+        /// </summary>
+        NU5034 = 5034,
+
+        /// <summary>
         /// AssemblyOutsideLibWarning
         /// </summary>
         NU5100 = 5100,

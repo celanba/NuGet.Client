@@ -181,17 +181,35 @@ namespace NuGet.Build.Tasks.Pack
                         Strings.InvalidLicenseCombination,
                         request.PackageLicenseExpression));
                 }
+                Version version;
 
-                NuGetVersion version;
-                if (!NuGetVersion.TryParse(request.PackageVersion, out version))
+                if (request.PackageLicenseExpressionVersion != null)
                 {
-                    throw new PackagingException(NuGetLogCode.NU5032, string.Format(
-                        CultureInfo.CurrentCulture,
-                        Strings.InvalidLicenseExpression,
-                        request.PackageLicenseExpression)); // TODO NK - Append the message from the parsing.
+                    if (!Version.TryParse(request.PackageLicenseExpressionVersion, out version))
+                    {
+                        throw new PackagingException(NuGetLogCode.NU5034, string.Format(
+                            CultureInfo.CurrentCulture,
+                            Strings.InvalidLicenseExpressionVersion,
+                            request.PackageLicenseExpressionVersion));
+                    }
+                }
+                else
+                {
+                    version = LicenseMetadata.EmptyVersion;
                 }
 
-                builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, request.PackageLicenseFile);
+                if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0) // TODO NK - throw if older/newer version maybe?
+                {
+                    NuGetVersion validationBla;
+                    if (!NuGetVersion.TryParse(request.PackageVersion, out validationBla))
+                    {
+                        throw new PackagingException(NuGetLogCode.NU5032, string.Format(
+                            CultureInfo.CurrentCulture,
+                            Strings.InvalidLicenseExpression,
+                            request.PackageLicenseExpression)); // TODO NK - Append the message from the parsing.
+                    }
+                }
+                builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, request.PackageLicenseFile, version);
             }
 
             if (request.MinClientVersion != null)

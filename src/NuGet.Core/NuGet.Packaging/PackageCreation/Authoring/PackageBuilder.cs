@@ -481,17 +481,17 @@ namespace NuGet.Packaging
 
         public static void ValidateLicenseFile(IEnumerable<IPackageFile> files, LicenseMetadata licenseMetadata)
         {
-            if (licenseMetadata.Src != null)
+            if (licenseMetadata.File != null)
             {
-                var ext = Path.GetExtension(licenseMetadata.Src);
+                var ext = Path.GetExtension(licenseMetadata.File);
                 if (ext != null && ext.Equals(".txt", StringComparison.OrdinalIgnoreCase) && ext.Equals(".md", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new PackagingException(NuGetLogCode.NU5031, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileExtensionIsInvalid, licenseMetadata.Src));
+                    throw new PackagingException(NuGetLogCode.NU5031, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileExtensionIsInvalid, licenseMetadata.File));
                 }
-                var count = files.Where(e => e.Path.Equals(licenseMetadata.Src)).Count();
+                var count = files.Where(e => e.Path.Equals(licenseMetadata.File)).Count();
                 if (count == 0)
                 {
-                    throw new PackagingException(NuGetLogCode.NU5030, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileIsNotInNupkg, licenseMetadata.Src));
+                    throw new PackagingException(NuGetLogCode.NU5030, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileIsNotInNupkg, licenseMetadata.File));
                 }
             }
         }

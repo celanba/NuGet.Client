@@ -647,6 +647,24 @@ namespace NuGet.Packaging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The license expression &apos;{0}&apos; cannot be parsed succesfully..
+        /// </summary>
+        internal static string License_InvalidLicenseExpression {
+            get {
+                return ResourceManager.GetString("License_InvalidLicenseExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The version string &apos;{0}&apos; for the LicenseExpression is invalid..
+        /// </summary>
+        internal static string License_InvalidLicenseExpressionVersion {
+            get {
+                return ResourceManager.GetString("License_InvalidLicenseExpressionVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installing {0} {1}..
         /// </summary>
         internal static string Log_InstallingPackage {
