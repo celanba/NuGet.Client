@@ -326,6 +326,19 @@ namespace NuGet.Packaging.Test
                   </metadata>
                 </package>";
 
+        private const string LicenseExpressionBasicExplicitVersion = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license expression=""MIT"" version=""0.0.0""/>
+                  </metadata>
+                </package>";
+
         private const string LicenseExpressionHasBothAttributes = @"<?xml version=""1.0""?>
                 <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
                   <metadata>
@@ -781,6 +794,21 @@ namespace NuGet.Packaging.Test
             // Assert
             licenseMetadata.LicenseExpression.Should().Be("MIT");
             licenseMetadata.File.Should().Be(null);
+        }
+
+        [Fact]
+        public void NuspecReaderTests_LicenseExpressionBasicExplicitVersion()
+        {
+            // Arrange
+            var reader = GetReader(LicenseExpressionBasicExplicitVersion);
+
+            // Act
+            var licenseMetadata = reader.GetLicenseMedata();
+
+            // Assert
+            licenseMetadata.LicenseExpression.Should().Be("MIT");
+            licenseMetadata.File.Should().Be(null);
+            licenseMetadata.Version.Should().Be(new Version(0, 0, 0));
         }
 
         [Fact]
