@@ -481,10 +481,12 @@ namespace NuGet.Packaging
 
         public static void ValidateLicenseFile(IEnumerable<IPackageFile> files, LicenseMetadata licenseMetadata)
         {
-            if (licenseMetadata.File != null)
+            if (licenseMetadata?.File != null)
             {
                 var ext = Path.GetExtension(licenseMetadata.File);
-                if (ext != null && ext.Equals(".txt", StringComparison.OrdinalIgnoreCase) && ext.Equals(".md", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrEmpty(ext) &&
+                        ext.Equals(".txt", StringComparison.OrdinalIgnoreCase) &&
+                        ext.Equals(".md", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new PackagingException(NuGetLogCode.NU5031, string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseFileExtensionIsInvalid, licenseMetadata.File));
                 }
