@@ -70,8 +70,8 @@ namespace NuGet.Protocol
             return _sha512Cache.GetOrAdd(sha512Path,
                 e => new Lazy<string>(() =>
                 {
-                    var hashFile = NupkgMetadataFileFormat.Read(e);
-                    return hashFile.ContentHash;
+                    var metadataFile = NupkgMetadataFileFormat.Read(e);
+                    return metadataFile.ContentHash;
                 }));
         }
 

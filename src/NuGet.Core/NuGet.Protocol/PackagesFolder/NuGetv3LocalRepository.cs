@@ -162,16 +162,16 @@ namespace NuGet.Repositories
                         continue;
                     }
 
-                    var newHashPath = PathResolver.GetNupkgMetadataPath(id, version);
+                    var nupkgMetadataPath = PathResolver.GetNupkgMetadataPath(id, version);
                     var hashPath = PathResolver.GetHashPath(id, version);
                     var zipPath = PathResolver.GetPackageFilePath(id, version);
                     var installPath = PathResolver.GetInstallPath(id, version);
 
                     // The hash file is written last. If this file does not exist then the package is
                     // incomplete and should not be used.
-                    if (_packageFileCache.Sha512Exists(newHashPath))
+                    if (_packageFileCache.Sha512Exists(nupkgMetadataPath))
                     {
-                        package = CreateLocalPackageInfo(id, version, fullVersionDir, newHashPath, zipPath);
+                        package = CreateLocalPackageInfo(id, version, fullVersionDir, nupkgMetadataPath, zipPath);
 
                         // Cache the package, if it is valid it will not change
                         // for the life of this restore.
@@ -180,9 +180,9 @@ namespace NuGet.Repositories
                     }
                     else if(_packageFileCache.Sha512Exists(hashPath))
                     {
-                        LocalFolderUtility.GenerateNewHashFile(zipPath, installPath, hashPath, newHashPath);
+                        LocalFolderUtility.GenerateNupkgMetadataFile(zipPath, installPath, hashPath, nupkgMetadataPath);
 
-                        package = CreateLocalPackageInfo(id, version, fullVersionDir, newHashPath, zipPath);
+                        package = CreateLocalPackageInfo(id, version, fullVersionDir, nupkgMetadataPath, zipPath);
 
                         // Cache the package, if it is valid it will not change
                         // for the life of this restore.

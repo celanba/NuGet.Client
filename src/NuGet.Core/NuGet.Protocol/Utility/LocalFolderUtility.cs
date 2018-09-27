@@ -1158,15 +1158,15 @@ namespace NuGet.Protocol
             return fileInfo;
         }
 
-        public static void GenerateNewHashFile(string nupkgPath, string installPath, string hashPath, string newHashPath)
+        public static void GenerateNupkgMetadataFile(string nupkgPath, string installPath, string hashPath, string nupkgMetadataPath)
         {
             ConcurrencyUtilities.ExecuteWithFileLocked(nupkgPath,
                 action: () =>
                 {
                     // make sure new hash file doesn't exists within File lock before actually creating it.
-                    if (!File.Exists(newHashPath))
+                    if (!File.Exists(nupkgMetadataPath))
                     {
-                        var tempNewHashFilePath = Path.Combine(installPath, Path.GetRandomFileName());
+                        var tempNupkgMetadataFilePath = Path.Combine(installPath, Path.GetRandomFileName());
                         using (var stream = File.Open(nupkgPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                         using (var packageReader = new PackageArchiveReader(stream))
                         {
@@ -1185,8 +1185,8 @@ namespace NuGet.Protocol
                                 ContentHash = packageHash
                             };
 
-                            NupkgMetadataFileFormat.Write(tempNewHashFilePath, hashFile);
-                            File.Move(tempNewHashFilePath, newHashPath);
+                            NupkgMetadataFileFormat.Write(tempNupkgMetadataFilePath, hashFile);
+                            File.Move(tempNupkgMetadataFilePath, nupkgMetadataPath);
                         }
                     }
                 });

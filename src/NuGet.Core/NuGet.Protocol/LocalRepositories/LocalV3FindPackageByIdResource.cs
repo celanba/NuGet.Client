@@ -385,12 +385,12 @@ namespace NuGet.Protocol
                         continue;
                     }
 
-                    var newHashPath = _resolver.GetNupkgMetadataPath(id, version);
+                    var nupkgMetadataPath = _resolver.GetNupkgMetadataPath(id, version);
                     var hashPath = _resolver.GetHashPath(id, version);
 
                     // first check for existing hash file then new hash file.
                     // if either of the file doesn't exists, then package was not installed correctly.
-                    if (!(File.Exists(hashPath) || File.Exists(newHashPath)))
+                    if (!(File.Exists(hashPath) || File.Exists(nupkgMetadataPath)))
                     {
                         // Writing the marker file is the last operation performed by NuGetPackageUtils.InstallFromStream. We'll use the
                         // presence of the file to denote the package was successfully installed.

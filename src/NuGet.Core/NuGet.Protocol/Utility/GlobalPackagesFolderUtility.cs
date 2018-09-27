@@ -34,7 +34,7 @@ namespace NuGet.Protocol
 
             var defaultPackagePathResolver = new VersionFolderPathResolver(globalPackagesFolder);
 
-            var newHashPath = defaultPackagePathResolver.GetNupkgMetadataPath(packageIdentity.Id, packageIdentity.Version);
+            var nupkgMetadataPath = defaultPackagePathResolver.GetNupkgMetadataPath(packageIdentity.Id, packageIdentity.Version);
             var hashPath = defaultPackagePathResolver.GetHashPath(packageIdentity.Id, packageIdentity.Version);
             var installPath = defaultPackagePathResolver.GetInstallPath(
                     packageIdentity.Id,
@@ -43,13 +43,13 @@ namespace NuGet.Protocol
                 packageIdentity.Id,
                 packageIdentity.Version);
 
-            if (File.Exists(newHashPath))
+            if (File.Exists(nupkgMetadataPath))
             {
                 return CreateDownloadResourceResult(nupkgPath, installPath);
             }
             else if (File.Exists(hashPath))
             {
-                LocalFolderUtility.GenerateNewHashFile(nupkgPath, installPath, hashPath, newHashPath);
+                LocalFolderUtility.GenerateNupkgMetadataFile(nupkgPath, installPath, hashPath, nupkgMetadataPath);
                 return CreateDownloadResourceResult(nupkgPath, installPath);
             }
 

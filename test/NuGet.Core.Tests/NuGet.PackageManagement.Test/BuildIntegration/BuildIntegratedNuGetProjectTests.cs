@@ -94,10 +94,10 @@ namespace NuGet.PackageManagement.Test
 
                 var resolver = new VersionFolderPathResolver(solutionManager.GlobalPackagesFolder);
                 var hashPath = resolver.GetHashPath("nuget.versioning", NuGetVersion.Parse("1.0.7"));
-                var newHashPath = resolver.GetNupkgMetadataPath("nuget.versioning", NuGetVersion.Parse("1.0.7"));
+                var nupkgMetadataPath = resolver.GetNupkgMetadataPath("nuget.versioning", NuGetVersion.Parse("1.0.7"));
 
                 File.Delete(hashPath);
-                File.Delete(newHashPath);
+                File.Delete(nupkgMetadataPath);
 
                 var restoreSummaries = await DependencyGraphRestoreUtility.RestoreAsync(
                     solutionManager,
