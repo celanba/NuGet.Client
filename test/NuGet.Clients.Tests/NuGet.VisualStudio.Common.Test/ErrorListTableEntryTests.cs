@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Globalization;
 using FluentAssertions;
 using Microsoft.VisualStudio.Shell.TableManager;
 using NuGet.Common;
@@ -83,6 +84,8 @@ namespace NuGet.VisualStudio.Common.Test
         [InlineData(StandardTableKeyNames.HelpKeyword, _testCodeString)]
         public void TryGetValue_StringContent_ReturnsValues(string key, string content)
         {
+            CultureInfo.CurrentCulture = new CultureInfo("en-US");
+
             // Arrange
             var logMessage = new RestoreLogMessage(LogLevel.Error, _testCode, _testMessage)
             {
