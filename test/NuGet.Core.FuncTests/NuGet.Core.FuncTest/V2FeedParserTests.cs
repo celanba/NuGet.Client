@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -41,7 +41,7 @@ namespace NuGet.Core.FuncTest
                 var packageReader = downloadResult.PackageReader;
                 var files = packageReader.GetFiles();
 
-                Assert.Equal(11, files.Count());
+                Assert.Equal(12, files.Count());
             }
         }
     }
