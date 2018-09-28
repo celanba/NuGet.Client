@@ -9,6 +9,7 @@ using FluentAssertions;
 using NuGet.Common;
 using NuGet.Frameworks;
 using NuGet.Packaging;
+using NuGet.Packaging.Licenses;
 using NuGet.Test.Utility;
 using NuGet.Versioning;
 using Xunit;
@@ -2934,12 +2935,34 @@ namespace ClassLibrary
             }
         }
 
-        [PlatformFact(Platform.Windows)]
-        public void PackCommand_PackLicense_SimpleExpression_StandardLicense()
+        //What if the package expression does not parse? What happens in Visual Studio.
+        //valid simple/complex expression. 
+        //Expression with non standard license...causing a warning NU5124
+        //invalid expression - NU5032
+        // invalid license exdpression version - NU5034
+        // higher license expression version than this can process. 
+        //license file 
+        //license file not present on disk
+        //license file with an ivnalid extensions(each extensions needs to be valid.)
+
+        // Reproduce all error/warning codes - NU5033 Invalid license metadata
+        //nuspec pack.
+        //valid expression
+        //invalid expression
+        //both expression and LicenseFile
+        //license file
+        //license file not present on disk
+        //license file with an ivnalid extensions (each extensions needs to be valid.)
+        //convention based license file inclusion.
+        //convention based license file inclusion with duplicates.
+
+        [PlatformTheory(Platform.Windows)]
+        [InlineData("MIT")]
+        [InlineData("MIT OR Apache-2.0 WITH 389-exception")]
+        public void PackCommand_PackLicense_SimpleExpression_StandardLicense(string licenseExpr)
         {
             using (var testDirectory = TestDirectory.Create())
             {
-                var licenseExpr = "MIT";
                 // Set up
                 var projectName = "ClassLibrary1";
                 var workingDirectory = Path.Combine(testDirectory, projectName);
@@ -2950,7 +2973,7 @@ namespace ClassLibrary
                 using (var stream = new FileStream(projectFile, FileMode.Open, FileAccess.ReadWrite))
                 {
                     var xml = XDocument.Load(stream);
-                    ProjectFileUtils.AddProperty(xml, "NuGetLicenseExpression", licenseExpr);
+                    ProjectFileUtils.AddProperty(xml, "PackageLicenseExpression", licenseExpr);
                     ProjectFileUtils.WriteXmlToFile(xml, stream);
                 }
 
@@ -2977,6 +3000,91 @@ namespace ClassLibrary
                     Assert.Equal(licenseMetadata.License, licenseExpr);
                     Assert.Equal(licenseExpr, licenseMetadata.LicenseExpression.ToString());
                 }
+            }
+        }
+
+        [PlatformFact(Platform.Windows)]
+        public void PackCommand_PackLicense_ComplexExpression_WithNonStandardLicense()
+        {
+            using (var testDirectory = TestDirectory.Create())
+            {
+                var customLicense = "LicenseRef-Nikolche";
+                var licenseExpr = $"MIT OR {customLicense} WITH 389-exception";
+                // Set up
+                var projectName = "ClassLibrary1";
+                var workingDirectory = Path.Combine(testDirectory, projectName);
+                msbuildFixture.CreateDotnetNewProject(testDirectory.Path, projectName, " classlib");
+                var projectFile = Path.Combine(workingDirectory, $"{projectName}.csproj");
+
+                // Setup LicenseExpression
+                using (var stream = new FileStream(projectFile, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    var xml = XDocument.Load(stream);
+                    ProjectFileUtils.AddProperty(xml, "PackageLicenseExpression", licenseExpr);
+                    ProjectFileUtils.WriteXmlToFile(xml, stream);
+                }
+
+                msbuildFixture.RestoreProject(workingDirectory, projectName, string.Empty);
+                var result = msbuildFixture.PackProject(workingDirectory, projectName, $"-o {workingDirectory}");
+
+                var nupkgPath = Path.Combine(workingDirectory, $"{projectName}.1.0.0.nupkg");
+                var nuspecPath = Path.Combine(workingDirectory, "obj", $"{projectName}.1.0.0.nuspec");
+                Assert.True(File.Exists(nupkgPath), "The output .nupkg is not in the expected place");
+                Assert.True(File.Exists(nuspecPath), "The intermediate nuspec file is not in the expected place");
+
+                Assert.True(result.Success);
+                Assert.True(result.AllOutput.Contains("NU5124"));
+
+                using (var nupkgReader = new PackageArchiveReader(nupkgPath))
+                {
+                    var nuspecReader = nupkgReader.NuspecReader;
+
+                    // Validate the output .nuspec.
+                    Assert.Equal("ClassLibrary1", nuspecReader.GetId());
+                    Assert.Equal("1.0.0", nuspecReader.GetVersion().ToFullString());
+                    Assert.False(nuspecReader.GetRequireLicenseAcceptance());
+                    var licenseMetadata = nuspecReader.GetLicenseMetadata();
+                    Assert.NotNull(licenseMetadata);
+                    Assert.Equal(licenseMetadata.Type, LicenseType.Expression);
+                    Assert.Equal(licenseMetadata.Version, LicenseMetadata.EmptyVersion);
+                    Assert.Equal(licenseMetadata.License, licenseExpr);
+                    Assert.False(licenseMetadata.LicenseExpression.HasOnlyStandardIdentifiers());
+                    Assert.Equal(licenseExpr, licenseMetadata.LicenseExpression.ToString());
+                }
+            }
+        }
+
+        [PlatformFact(Platform.Windows)]
+        [InlineData("Cant Parse This")]
+        [InlineData("Tanana nana nana")]
+        public void PackCommand_PackLicense_NonParsableExpressionThrowsErrorWithCode(string licenseExpr)
+        {
+            using (var testDirectory = TestDirectory.Create())
+            {
+                // Set up
+                var projectName = "ClassLibrary1";
+                var workingDirectory = Path.Combine(testDirectory, projectName);
+                msbuildFixture.CreateDotnetNewProject(testDirectory.Path, projectName, " classlib");
+                var projectFile = Path.Combine(workingDirectory, $"{projectName}.csproj");
+
+                // Setup LicenseExpression
+                using (var stream = new FileStream(projectFile, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    var xml = XDocument.Load(stream);
+                    ProjectFileUtils.AddProperty(xml, "PackageLicenseExpression", licenseExpr);
+                    ProjectFileUtils.WriteXmlToFile(xml, stream);
+                }
+
+                msbuildFixture.RestoreProject(workingDirectory, projectName, string.Empty);
+                var result = msbuildFixture.PackProject(workingDirectory, projectName, $"-o {workingDirectory}");
+
+                var nupkgPath = Path.Combine(workingDirectory, $"{projectName}.1.0.0.nupkg");
+                var nuspecPath = Path.Combine(workingDirectory, "obj", $"{projectName}.1.0.0.nuspec");
+                Assert.False(File.Exists(nupkgPath));
+                Assert.False(File.Exists(nuspecPath));
+
+                Assert.False(result.Success);
+                Assert.True(result.AllOutput.Contains("NU5124"));
             }
         }
     }

@@ -481,7 +481,7 @@ namespace NuGet.Packaging
 
         public static void ValidateLicenseFile(IEnumerable<IPackageFile> files, LicenseMetadata licenseMetadata)
         {
-            if (licenseMetadata.Type == LicenseType.File)
+            if (licenseMetadata?.Type == LicenseType.File)
             {
                 var ext = Path.GetExtension(licenseMetadata.License);
                 if (string.IsNullOrEmpty(ext) &&

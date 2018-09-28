@@ -18,17 +18,18 @@ namespace NuGet.Packaging.Rules
 
         public IEnumerable<PackagingLogMessage> Validate(PackageArchiveReader builder)
         {
-
             var nuspecReader = builder.NuspecReader;
             var licenseMetadata = nuspecReader.GetLicenseMetadata();
-            if (licenseMetadata.Type == LicenseType.Expression)
+            if (licenseMetadata?.Type == LicenseType.Expression)
             {
-                return ValidateAllLicenseLeafs(licenseMetadata.LicenseExpression);
+                var warnings = new List<PackagingLogMessage>();
+                ValidateAllLicenseLeafs(licenseMetadata.LicenseExpression, warnings);
+                return warnings;
             }
             return Enumerable.Empty<PackagingLogMessage>();
         }
 
-        private IEnumerable<PackagingLogMessage> ValidateAllLicenseLeafs(NuGetLicenseExpression expression)
+        private void ValidateAllLicenseLeafs(NuGetLicenseExpression expression, IList<PackagingLogMessage> logMessages)
         {
             switch (expression.Type)
             {
@@ -36,9 +37,10 @@ namespace NuGet.Packaging.Rules
                     var license = (NuGetLicense)expression;
                     if (!license.IsStandardLicense)
                     {
-                        yield return PackagingLogMessage.CreateWarning(
+                        logMessages.Add(
+                            PackagingLogMessage.CreateWarning(
                                         string.Format(CultureInfo.CurrentCulture, MessageFormat, license.Identifier),
-                                        NuGetLogCode.NU5124);
+                                        NuGetLogCode.NU5124));
                     }
                     break;
 
@@ -48,13 +50,13 @@ namespace NuGet.Packaging.Rules
                     {
                         case LicenseOperatorType.LogicalOperator:
                             var logicalOperator = (LogicalOperator)licenseOperator;
-                            ValidateAllLicenseLeafs(logicalOperator.Left);
-                            ValidateAllLicenseLeafs(logicalOperator.Right);
+                            ValidateAllLicenseLeafs(logicalOperator.Left, logMessages);
+                            ValidateAllLicenseLeafs(logicalOperator.Right, logMessages);
                             break;
 
                         case LicenseOperatorType.WithOperator:
                             var withOperator = (WithOperator)licenseOperator;
-                            ValidateAllLicenseLeafs(withOperator.License);
+                            ValidateAllLicenseLeafs(withOperator.License, logMessages);
                             break;
 
                         default:
