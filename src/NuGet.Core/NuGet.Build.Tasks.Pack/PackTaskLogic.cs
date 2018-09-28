@@ -12,6 +12,7 @@ using NuGet.Frameworks;
 using NuGet.LibraryModel;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
+using NuGet.Packaging.Licenses;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
 
@@ -174,7 +175,7 @@ namespace NuGet.Build.Tasks.Pack
 
             if (!string.IsNullOrEmpty(request.PackageLicenseExpression) || !string.IsNullOrEmpty(request.PackageLicenseFile))
             {
-                if(request.PackageLicenseExpression != null && request.PackageLicenseFile != null)
+                if (request.PackageLicenseExpression != null && request.PackageLicenseFile != null)
                 {
                     throw new PackagingException(NuGetLogCode.NU5033, string.Format(
                         CultureInfo.CurrentCulture,
@@ -200,16 +201,21 @@ namespace NuGet.Build.Tasks.Pack
 
                 if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0) // TODO NK - throw if older/newer version maybe?
                 {
-                    NuGetVersion validationBla;
-                    if (!NuGetVersion.TryParse(request.PackageVersion, out validationBla))
+
+                    try
+                    {
+                        var expression = NuGetLicenseExpression.Parse(request.PackageLicenseExpression);
+                        builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, expression, request.PackageLicenseFile, version);
+                    }
+                    catch (NuGetLicenseExpressionParsingException e) // TODO NK - Validate that the internal message is actually validated.
                     {
                         throw new PackagingException(NuGetLogCode.NU5032, string.Format(
-                            CultureInfo.CurrentCulture,
-                            Strings.InvalidLicenseExpression,
-                            request.PackageLicenseExpression)); // TODO NK - Append the message from the parsing.
+                               CultureInfo.CurrentCulture,
+                               Strings.InvalidLicenseExpression,
+                               request.PackageLicenseExpression),
+                               e);
                     }
                 }
-                builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, request.PackageLicenseFile, version);
             }
 
             if (request.MinClientVersion != null)

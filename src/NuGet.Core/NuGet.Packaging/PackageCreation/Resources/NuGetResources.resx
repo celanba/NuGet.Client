@@ -193,4 +193,7 @@
   <data name="Manifest_LicenseFileExtensionIsInvalid" xml:space="preserve">
     <value>The license file '{0}' has an invalid extension. Valid options are .txt, .md or none.</value>
   </data>
+  <data name="Manifest_LicenseUrlCannotBeUsedWithLicenseMetadata" xml:space="preserve">
+    <value>The licenseUrl and license elements cannot be used together. </value>
+  </data>
 </root>

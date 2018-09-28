@@ -45,7 +45,6 @@ namespace NuGet.Packaging.Xml
             {
                 elem.Add(new XElement(ns + "developmentDependency", metadata.DevelopmentDependency));
             }
-            AddElementIfNotNull(elem, ns, "licenseUrl", metadata.LicenseUrl);
             AddElementIfNotNull(elem, ns, "projectUrl", metadata.ProjectUrl);
             AddElementIfNotNull(elem, ns, "iconUrl", metadata.IconUrl);
             AddElementIfNotNull(elem, ns, "description", metadata.Description);
@@ -73,14 +72,19 @@ namespace NuGet.Packaging.Xml
                 }
             }
 
+            var licenseUrlToWrite = metadata.LicenseUrl;
             if (metadata.LicenseMetadata != null)
             {
+               
+               
                 var licenseElement = GetXElementFromLicenseMetadata(ns, metadata.LicenseMetadata);
                 if (licenseElement != null)
                 {
                     elem.Add(licenseElement);
                 }
+                licenseUrlToWrite = LicenseMetadata.DeprecateUrl;
             }
+            AddElementIfNotNull(elem, ns, "licenseUrl", licenseUrlToWrite);
 
             elem.Add(GetXElementFromGroupableItemSets(
                 ns,
@@ -246,12 +250,14 @@ namespace NuGet.Packaging.Xml
         {
             var attributes = new List<XAttribute>();
 
-            attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.LicenseExpression, metadata.LicenseExpression));
-            attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.File, metadata.File));
-
+            attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.Type, metadata.Type.ToString().ToLowerInvariant()));
+            if (!metadata.Version.Equals(LicenseMetadata.EmptyVersion))
+            {
+                attributes.Add(GetXAttributeFromNameAndValue(NuspecUtility.Version, metadata.Version));
+            }
             attributes = attributes.Where(xAtt => xAtt != null).ToList();
 
-            return new XElement(ns + NuspecUtility.License, attributes);
+            return new XElement(ns + NuspecUtility.License, metadata.License, attributes);
         }
 
         private static XElement GetXElementFromManifestRepository(XNamespace ns, RepositoryMetadata repository)
@@ -259,7 +265,7 @@ namespace NuGet.Packaging.Xml
             var attributeList = new List<XAttribute>();
             if (repository != null && !string.IsNullOrEmpty(repository.Type))
             {
-                attributeList.Add(new XAttribute(NuspecUtility.RepositoryType, repository.Type));
+                attributeList.Add(new XAttribute(NuspecUtility.Type, repository.Type));
             }
 
             if (repository != null && !string.IsNullOrEmpty(repository.Url))

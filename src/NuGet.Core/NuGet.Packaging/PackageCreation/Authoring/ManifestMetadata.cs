@@ -332,7 +332,11 @@ namespace NuGet.Packaging
             {
                 yield return NuGetResources.Manifest_RequireLicenseAcceptanceRequiresLicenseUrl;
             }
-            // TODO NK - Should the parsing of the nuget license be done here? validation be here or somewhere else.
+
+            if(_licenseUrl != null && LicenseMetadata != null && !_licenseUrl.Equals(LicenseMetadata.DeprecateUrl))
+            {
+                    yield return NuGetResources.Manifest_LicenseUrlCannotBeUsedWithLicenseMetadata;
+            }
         }
     }
 }

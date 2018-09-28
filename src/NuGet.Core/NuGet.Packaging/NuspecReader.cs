@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using NuGet.Common;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
+using NuGet.Packaging.Licenses;
 using NuGet.Versioning;
 
 namespace NuGet.Packaging
@@ -446,49 +447,55 @@ namespace NuGet.Packaging
                 // TODO NK - Put this in a common place and make it depend on one another.
                 // This and the PackTaskLogic stuff.
                 // The license should maybe be permissive here.
-                var file = licenseNode.Attribute(NuspecUtility.File)?.Value;
-                var expression = licenseNode.Attribute(NuspecUtility.LicenseExpression)?.Value;
+
+                var type = licenseNode.Attribute(NuspecUtility.Type).Value;
+                var license = licenseNode.Value;
                 var versionValue = licenseNode.Attribute(NuspecUtility.Version)?.Value;
-                
-                var expressionHasValue = !string.IsNullOrEmpty(expression);
-                var fileHasValue = !string.IsNullOrEmpty(file);
 
-                Version version = null;
-                if (versionValue != null)
+                var isKnownType = !Enum.TryParse(type, true, out LicenseType licenseType);
+
+                if (isKnownType)
                 {
-                    if (!System.Version.TryParse(versionValue, out version))
+                    Version version = null;
+                    if (versionValue != null)
                     {
-                        throw new PackagingException(NuGetLogCode.NU5034, string.Format(
-                            CultureInfo.CurrentCulture,
-                            Strings.License_InvalidLicenseExpressionVersion,
-                            versionValue));
+                        if (!System.Version.TryParse(versionValue, out version))
+                        {
+                            throw new PackagingException(NuGetLogCode.NU5034, string.Format(
+                                CultureInfo.CurrentCulture,
+                                Strings.License_InvalidLicenseExpressionVersion,
+                                versionValue));
+                        }
                     }
-                }
-                else
-                {
-                    version = LicenseMetadata.EmptyVersion;
-                }
-
-                if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0) // TODO NK - throw if older/newer version maybe?
-                {
-                    NuGetVersion validationBla;
-                    if (!NuGetVersion.TryParse(version.ToString(), out validationBla))
+                    else
                     {
-                        throw new PackagingException(NuGetLogCode.NU5032, string.Format(
-                            CultureInfo.CurrentCulture,
-                            Strings.License_InvalidLicenseExpression,
-                            expression)); // TODO NK - Append the message from the parsing.
+                        version = LicenseMetadata.EmptyVersion;
                     }
-                }
 
-                if (expressionHasValue ^ fileHasValue)
-                {
-                    return new LicenseMetadata(licenseExpression: expression, file: file, version: version);
-                }
+                    if (licenseType == LicenseType.Expression)
+                    {
+                        if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0)
+                        {
+                            try
+                            {
+                                var expression = NuGetLicenseExpression.Parse(license);
+                                return new LicenseMetadata(licenseType, license, expression, version);
+                            }
+                            catch (NuGetLicenseExpressionParsingException e) // TODO NK - Validate that the internal message is actually validated. Validate the scenario where the version is higher than the nuspec reader can understand.
+                            {
+                                throw new PackagingException(NuGetLogCode.NU5032, e.Message);
+                            }
 
-                throw new PackagingException("Invalid nuspec entry. Only file or licensexpression can be specified.");
+                        }
+                        else
+                        {
+                            return new LicenseMetadata(licenseType, license, null, version);
+                        }
+                    }
+
+                    return new LicenseMetadata(licenseType, license, null, LicenseMetadata.EmptyVersion);
+                }
             }
-
             return null;
         }
 

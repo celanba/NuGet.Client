@@ -21,13 +21,11 @@ namespace NuGet.Packaging.Core
         public static readonly string Version = "version";
         public static readonly string Serviceable = "serviceable";
         public static readonly string Repository = "repository";
-        public static readonly string RepositoryType = "type";
+        public static readonly string Type = "type";
         public static readonly string RepositoryUrl = "url";
         public static readonly string RepositoryBranch = "branch";
         public static readonly string RepositoryCommit = "commit";
         public static readonly string License = "license";
-        public static readonly string LicenseExpression = "expression";
-        public static readonly string File = "file";
 
         /// <summary>
         /// Gets the package types from a .nuspec metadata XML element.

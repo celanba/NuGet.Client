@@ -188,6 +188,15 @@ namespace NuGet.Packaging.PackageCreation.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The licenseUrl and license elements cannot be used together. .
+        /// </summary>
+        internal static string Manifest_LicenseUrlCannotBeUsedWithLicenseMetadata {
+            get {
+                return ResourceManager.GetString("Manifest_LicenseUrlCannotBeUsedWithLicenseMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured while trying to parse the value &apos;{0}&apos; of property &apos;{1}&apos; in the manifest file..
         /// </summary>
         internal static string Manifest_PropertyValueReadFailure {

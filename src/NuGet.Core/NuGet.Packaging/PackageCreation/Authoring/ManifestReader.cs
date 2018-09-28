@@ -13,6 +13,7 @@ using NuGet.Versioning;
 using NuGet.Packaging.Core;
 using NuGet.Frameworks;
 using NuGet.Common;
+using NuGet.Packaging.Licenses;
 
 namespace NuGet.Packaging
 {
@@ -167,50 +168,63 @@ namespace NuGet.Packaging
             }
         }
 
-        private static LicenseMetadata ReadLicenseMetadata(XElement element)
+        private static LicenseMetadata ReadLicenseMetadata(XElement licenseNode)
         {
-            var file = element.Attribute(NuspecUtility.File)?.Value;
-            var expression = element.Attribute(NuspecUtility.LicenseExpression)?.Value;
-            var versionValue = element.Attribute(NuspecUtility.Version)?.Value;
 
-            var expressionHasValue = string.IsNullOrEmpty(expression);
-            var fileHasValue = string.IsNullOrEmpty(file);
+            var type = licenseNode.Attribute(NuspecUtility.Type).Value;
+            var license = licenseNode.Value;
+            var versionValue = licenseNode.Attribute(NuspecUtility.Version)?.Value;
 
-            if ((expressionHasValue && fileHasValue) || (!expressionHasValue && !expressionHasValue))
+
+            if (!Enum.TryParse(type, true, out LicenseType licenseType))
             {
-                throw new PackagingException(string.Format(CultureInfo.CurrentCulture, NuGetResources.Manifest_LicenseElementMissingAttributes));
+                throw new PackagingException("Invalid license type {0}");
             }
 
-            Version version = null;
-            if (versionValue != null)
+            if (versionValue != null && licenseType != LicenseType.Expression)
             {
-                if (!Version.TryParse(versionValue, out version))
-                {
-                    throw new PackagingException(NuGetLogCode.NU5034, string.Format(
-                        CultureInfo.CurrentCulture,
-                        Strings.License_InvalidLicenseExpressionVersion,
-                        versionValue));
-                }
-            }
-            else
-            {
-                version = LicenseMetadata.EmptyVersion;
+                throw new PackagingException("Don't use version without an expression");
             }
 
-            if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0) // TODO NK - throw if older/newer version maybe?
+            switch (licenseType)
             {
-                NuGetVersion validationBla;
-                if (!NuGetVersion.TryParse(version.ToString(), out validationBla))
-                {
-                    throw new PackagingException(NuGetLogCode.NU5032, string.Format(
-                        CultureInfo.CurrentCulture,
-                        Strings.License_InvalidLicenseExpression,
-                        expression)); // TODO NK - Append the message from the parsing.
-                }
+                case LicenseType.Expression:
+                    Version version = null;
+                    if (versionValue != null)
+                    {
+                        if (!Version.TryParse(versionValue, out version))
+                        {
+                            throw new PackagingException(NuGetLogCode.NU5034, string.Format(
+                                CultureInfo.CurrentCulture,
+                                Strings.License_InvalidLicenseExpressionVersion,
+                                versionValue));
+                        }
+                    }
+                    else
+                    {
+                        version = LicenseMetadata.EmptyVersion;
+                    }
+                    if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0)
+                    {
+                        try
+                        {
+                            var expression = NuGetLicenseExpression.Parse(license);
+                            return new LicenseMetadata(licenseType, license, expression, version);
+                        }
+                        catch (NuGetLicenseExpressionParsingException e) // TODO NK - Validate that the internal message is actually validated. Validate the scenario where the version is higher than the nuspec reader can understand.
+                        {
+                            throw new PackagingException(NuGetLogCode.NU5032, e.Message);
+                        }
 
+                    }
+                    throw new PackagingException($"The license expression version {0} cannot be handled by this client"); // Validate this scenario.
+
+                case LicenseType.File:
+                    return new LicenseMetadata(licenseType, license, null, LicenseMetadata.EmptyVersion);
+
+                default:
+                    throw new PackagingException("Illegal license type");
             }
-            // This should only be used during nuspec pack, not when it's being read. 
-            return new LicenseMetadata(licenseExpression: expression, file: file, version: version);
         }
 
         private static List<ManifestContentFiles> ReadContentFiles(XElement contentFilesElement)

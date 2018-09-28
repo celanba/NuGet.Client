@@ -11,6 +11,7 @@ using NuGet.Packaging.Core;
 using System.Collections.Generic;
 using NuGet.Versioning;
 using FluentAssertions;
+using NuGet.Packaging.Licenses;
 
 namespace NuGet.Packaging.Test
 {
@@ -322,7 +323,7 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license expression=""MIT""/>
+                    <license type=""expression""/>MIT<license/>
                   </metadata>
                 </package>";
 
@@ -335,7 +336,7 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license expression=""MIT"" version=""0.0.0""/>
+                    <license type=""expression"" version=""0.0.0""/>MIT<license/>
                   </metadata>
                 </package>";
 
@@ -348,7 +349,7 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license src=""LICENSE.txt"" expression=""MIT""/>
+                    <license type=""file""/>LICENSE.txt<license/>
                   </metadata>
                 </package>";
 
@@ -778,8 +779,10 @@ namespace NuGet.Packaging.Test
             var licenseMetadata = reader.GetLicenseMedata();
 
             // Assert
+            licenseMetadata.Type.Should().Be(LicenseType.File);
             licenseMetadata.LicenseExpression.Should().Be(null);
-            licenseMetadata.File.Should().Be("LICENSE.txt");
+            licenseMetadata.License.Should().Be("LICENSE.txt");
+            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
         }
 
         [Fact]
@@ -792,8 +795,11 @@ namespace NuGet.Packaging.Test
             var licenseMetadata = reader.GetLicenseMedata();
 
             // Assert
-            licenseMetadata.LicenseExpression.Should().Be("MIT");
-            licenseMetadata.File.Should().Be(null);
+            licenseMetadata.Type.Should().Be(LicenseType.Expression);
+            licenseMetadata.LicenseExpression.Should().BeAssignableTo<NuGetLicense>("Because it is a simple license expression");
+            licenseMetadata.License.Should().Be("MIT");
+            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
+            Assert.Equal(licenseMetadata.License, licenseMetadata.LicenseExpression.ToString());
         }
 
         [Fact]
@@ -806,9 +812,11 @@ namespace NuGet.Packaging.Test
             var licenseMetadata = reader.GetLicenseMedata();
 
             // Assert
-            licenseMetadata.LicenseExpression.Should().Be("MIT");
-            licenseMetadata.File.Should().Be(null);
-            licenseMetadata.Version.Should().Be(new Version(0, 0, 0));
+            licenseMetadata.Type.Should().Be(LicenseType.Expression);
+            licenseMetadata.LicenseExpression.Should().BeAssignableTo<NuGetLicense>("Because it is a simple license expression");
+            licenseMetadata.License.Should().Be("MIT");
+            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
+            Assert.Equal(licenseMetadata.License, licenseMetadata.LicenseExpression.ToString());
         }
 
         [Fact]
