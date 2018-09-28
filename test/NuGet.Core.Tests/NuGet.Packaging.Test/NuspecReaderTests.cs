@@ -310,7 +310,7 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license src=""LICENSE.txt""/>
+                    <license type=""file"">LICENSE.txt</license>
                   </metadata>
                 </package>";
 
@@ -323,7 +323,7 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license type=""expression""/>MIT<license/>
+                    <license type=""expression"">MIT</license>
                   </metadata>
                 </package>";
 
@@ -336,11 +336,11 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license type=""expression"" version=""0.0.0""/>MIT<license/>
+                    <license type=""expression"" version=""0.0"">MIT</license>
                   </metadata>
                 </package>";
 
-        private const string LicenseExpressionHasBothAttributes = @"<?xml version=""1.0""?>
+        private const string LicenseExpressionBasicExplicitHighVersion = @"<?xml version=""1.0""?>
                 <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
                   <metadata>
                     <id>packageA</id>
@@ -349,9 +349,35 @@ namespace NuGet.Packaging.Test
                     <authors>ownera, ownerb</authors>
                     <owners>ownera, ownerb</owners>
                     <description>package A description.</description>
-                    <license type=""file""/>LICENSE.txt<license/>
+                    <license type=""expression"" version=""10.0"">MIT</license>
                   </metadata>
                 </package>";
+
+        private const string LicenseExpressionBasicMissingValue = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license type=""expression""></license>
+                  </metadata>
+                </package>";
+
+        private const string LicenseExpressionBadExpression = @"<?xml version=""1.0""?>
+                <package xmlns=""http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd"">
+                  <metadata>
+                    <id>packageA</id>
+                    <version>1.0.1-alpha</version>
+                    <title>Package A</title>
+                    <authors>ownera, ownerb</authors>
+                    <owners>ownera, ownerb</owners>
+                    <description>package A description.</description>
+                    <license type=""expression"">MIT oR Apache-2.0</license>
+                  </metadata>
+                </package>"; 
 
         public static IEnumerable<object[]> GetValidVersions()
         {
@@ -798,8 +824,8 @@ namespace NuGet.Packaging.Test
             licenseMetadata.Type.Should().Be(LicenseType.Expression);
             licenseMetadata.LicenseExpression.Should().BeAssignableTo<NuGetLicense>("Because it is a simple license expression");
             licenseMetadata.License.Should().Be("MIT");
-            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
             Assert.Equal(licenseMetadata.License, licenseMetadata.LicenseExpression.ToString());
+            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
         }
 
         [Fact]
@@ -815,25 +841,51 @@ namespace NuGet.Packaging.Test
             licenseMetadata.Type.Should().Be(LicenseType.Expression);
             licenseMetadata.LicenseExpression.Should().BeAssignableTo<NuGetLicense>("Because it is a simple license expression");
             licenseMetadata.License.Should().Be("MIT");
-            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
             Assert.Equal(licenseMetadata.License, licenseMetadata.LicenseExpression.ToString());
+            licenseMetadata.Version.Should().Be(LicenseMetadata.EmptyVersion);
         }
 
         [Fact]
-        public void NuspecReaderTests_LicenseExpressionHasBothAttributes_Throws()
+        public void NuspecReaderTests_LicenseExpressionBasicExplicitHighVersion()
         {
             // Arrange
-            var reader = GetReader(LicenseExpressionHasBothAttributes);
+            var reader = GetReader(LicenseExpressionBasicExplicitHighVersion);
 
-            //Act
-            Action action = () => reader.GetLicenseMedata();
+            // Act
+            var licenseMetadata = reader.GetLicenseMedata();
 
-            /// Assert
-            var ex = Assert.Throws<PackagingException>(action);
-            // TODO NK - Assert the exception content
+            // Assert
+            licenseMetadata.Type.Should().Be(LicenseType.Expression);
+            licenseMetadata.LicenseExpression.Should().Be(null);
+            licenseMetadata.License.Should().Be("MIT");
+            licenseMetadata.Version.Should().Be(new Version(10,0));
         }
 
+        [Fact]
+        public void NuspecReaderTests_LicenseExpressionMissingValueThrows()
+        {
+            // Arrange
+            var reader = GetReader(LicenseExpressionBasicMissingValue);
 
+            // Act
+           Action action = () => reader.GetLicenseMedata();
+
+            // Assert
+            Assert.Throws<PackagingException>(action);
+        }
+
+        [Fact]
+        public void NuspecReaderTests_LicenseExpressionBadExpressionThrows()
+        {
+            // Arrange
+            var reader = GetReader(LicenseExpressionBadExpression);
+
+            // Act
+            Action action = () => reader.GetLicenseMedata();
+
+            // Assert
+            Assert.Throws<PackagingException>(action);
+        }
 
         private static NuspecReader GetReader(string nuspec)
         {

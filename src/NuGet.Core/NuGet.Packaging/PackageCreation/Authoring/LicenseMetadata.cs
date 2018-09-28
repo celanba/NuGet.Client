@@ -11,7 +11,7 @@ namespace NuGet.Packaging
     {
         public static Version EmptyVersion = new Version(0, 0);
         public static Version CurrentVersion = new Version(0, 0);
-        public static Uri DeprecateUrl = new Uri("aka.ms/deprecateLicenseUrl");
+        public static Uri DeprecateUrl = new Uri("https://aka.ms/deprecateLicenseUrl");
         public LicenseType? Type { get; }
         public string License { get; }
         public NuGetLicenseExpression LicenseExpression { get; }

@@ -444,15 +444,11 @@ namespace NuGet.Packaging
 
             if (licenseNode != null)
             {
-                // TODO NK - Put this in a common place and make it depend on one another.
-                // This and the PackTaskLogic stuff.
-                // The license should maybe be permissive here.
-
                 var type = licenseNode.Attribute(NuspecUtility.Type).Value;
                 var license = licenseNode.Value;
                 var versionValue = licenseNode.Attribute(NuspecUtility.Version)?.Value;
 
-                var isKnownType = !Enum.TryParse(type, true, out LicenseType licenseType);
+                var isKnownType = Enum.TryParse(type, true, out LicenseType licenseType);
 
                 if (isKnownType)
                 {
@@ -483,16 +479,14 @@ namespace NuGet.Packaging
                             }
                             catch (NuGetLicenseExpressionParsingException e) // TODO NK - Validate that the internal message is actually validated. Validate the scenario where the version is higher than the nuspec reader can understand.
                             {
-                                throw new PackagingException(NuGetLogCode.NU5032, e.Message);
+                                throw new PackagingException(NuGetLogCode.NU5032, e.Message, e);
                             }
-
                         }
                         else
                         {
                             return new LicenseMetadata(licenseType, license, null, version);
                         }
                     }
-
                     return new LicenseMetadata(licenseType, license, null, LicenseMetadata.EmptyVersion);
                 }
             }
