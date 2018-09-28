@@ -201,11 +201,10 @@ namespace NuGet.Build.Tasks.Pack
 
                 if (version.CompareTo(LicenseMetadata.CurrentVersion) <= 0) // TODO NK - throw if older/newer version maybe?
                 {
-
                     try
                     {
                         var expression = NuGetLicenseExpression.Parse(request.PackageLicenseExpression);
-                        builder.LicenseMetadata = new LicenseMetadata(request.PackageLicenseExpression, expression, request.PackageLicenseFile, version);
+                        builder.LicenseMetadata = new LicenseMetadata(LicenseType.Expression, request.PackageLicenseExpression, expression, version);
                     }
                     catch (NuGetLicenseExpressionParsingException e) // TODO NK - Validate that the internal message is actually validated.
                     {

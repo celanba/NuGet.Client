@@ -802,7 +802,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseFileBasic);
 
             // Act
-            var licenseMetadata = reader.GetLicenseMedata();
+            var licenseMetadata = reader.GetLicenseMetadata();
 
             // Assert
             licenseMetadata.Type.Should().Be(LicenseType.File);
@@ -818,7 +818,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseExpressionBasic);
 
             // Act
-            var licenseMetadata = reader.GetLicenseMedata();
+            var licenseMetadata = reader.GetLicenseMetadata();
 
             // Assert
             licenseMetadata.Type.Should().Be(LicenseType.Expression);
@@ -835,7 +835,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseExpressionBasicExplicitVersion);
 
             // Act
-            var licenseMetadata = reader.GetLicenseMedata();
+            var licenseMetadata = reader.GetLicenseMetadata();
 
             // Assert
             licenseMetadata.Type.Should().Be(LicenseType.Expression);
@@ -852,7 +852,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseExpressionBasicExplicitHighVersion);
 
             // Act
-            var licenseMetadata = reader.GetLicenseMedata();
+            var licenseMetadata = reader.GetLicenseMetadata();
 
             // Assert
             licenseMetadata.Type.Should().Be(LicenseType.Expression);
@@ -868,7 +868,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseExpressionBasicMissingValue);
 
             // Act
-           Action action = () => reader.GetLicenseMedata();
+           Action action = () => reader.GetLicenseMetadata();
 
             // Assert
             Assert.Throws<PackagingException>(action);
@@ -881,7 +881,7 @@ namespace NuGet.Packaging.Test
             var reader = GetReader(LicenseExpressionBadExpression);
 
             // Act
-            Action action = () => reader.GetLicenseMedata();
+            Action action = () => reader.GetLicenseMetadata();
 
             // Assert
             Assert.Throws<PackagingException>(action);

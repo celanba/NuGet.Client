@@ -437,7 +437,7 @@ namespace NuGet.Packaging
         //convention based license file inclusion.
         //convention based license file inclusion with duplicates.
 
-        public LicenseMetadata GetLicenseMedata()
+        public LicenseMetadata GetLicenseMetadata()
         {
             var ns = MetadataNode.GetDefaultNamespace().NamespaceName;
             var licenseNode = MetadataNode.Elements(XName.Get(License, ns)).FirstOrDefault();

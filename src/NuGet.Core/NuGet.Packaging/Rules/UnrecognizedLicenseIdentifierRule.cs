@@ -20,7 +20,7 @@ namespace NuGet.Packaging.Rules
         {
 
             var nuspecReader = builder.NuspecReader;
-            var licenseMetadata = nuspecReader.GetLicenseMedata();
+            var licenseMetadata = nuspecReader.GetLicenseMetadata();
             if (licenseMetadata.Type == LicenseType.Expression)
             {
                 return ValidateAllLicenseLeafs(licenseMetadata.LicenseExpression);
