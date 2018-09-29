@@ -836,8 +836,8 @@ namespace NuGetVSExtension
                 {
                     isConsoleBusy = ConsoleStatus.Value.IsBusy;
                 }
-                
-                command.Visible = IsSolutionOpen;
+
+                command.Visible = IsSolutionOpen && await IsPackagesConfigBasedProjectAsync();
                 command.Enabled = !isConsoleBusy && IsSolutionExistsAndNotDebuggingAndNotBuilding() && HasActiveLoadedSupportedProject;
             });
         }
@@ -865,8 +865,30 @@ namespace NuGetVSExtension
                 command.Visible = IsSolutionOpen && IsPackagesConfigSelected();
                 command.Enabled = !isConsoleBusy && IsSolutionExistsAndNotDebuggingAndNotBuilding() && HasActiveLoadedSupportedProject;
             });
-
         }
+
+        private async Task<bool> IsPackagesConfigBasedProjectAsync()
+        {
+            var dteProject = EnvDTEProjectInfoUtility.GetActiveProject(VsMonitorSelection);
+
+            var uniqueName = EnvDTEProjectInfoUtility.GetUniqueName(dteProject);
+            var nuGetProject = await SolutionManager.Value.GetNuGetProjectAsync(uniqueName);
+
+            if (nuGetProject == null)
+            {
+                return false;
+            }
+
+            var msBuildNuGetProject = nuGetProject as MSBuildNuGetProject;
+
+            if (msBuildNuGetProject == null || !msBuildNuGetProject.PackagesConfigNuGetProject.PackagesConfigExists())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
         private bool IsSolutionOpen => _dte?.Solution != null && _dte.Solution.IsOpen;
 
